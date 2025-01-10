@@ -1,0 +1,1 @@
+from ._pystk_impl import sample_rate, set_sample_rate

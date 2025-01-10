@@ -1,0 +1,33 @@
+cmake_minimum_required(VERSION 3.30)
+project(python_bindings)
+
+find_package(Python 3.10
+  REQUIRED COMPONENTS Interpreter Development.Module
+  OPTIONAL_COMPONENTS Development.SABIModule)
+
+execute_process(
+  COMMAND "${Python3_EXECUTABLE}" -m nanobind --cmake_dir
+  OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE nanobind_ROOT
+)
+
+find_package(nanobind CONFIG REQUIRED)
+
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/stk/cmake ${CMAKE_MODULE_PATH})
+set(BUILD_SHARED OFF CACHE BOOL "Whether to build the shared library" FORCE)
+set(ENABLE_JACK OFF CACHE BOOL "Enable JACK" FORCE)
+set(ENABLE_ALSA OFF CACHE BOOL "Enable ALSA API support (linux only)" FORCE)
+set(ENABLE_DS OFF CACHE BOOL "Enable DirectSound API support (windows only)" FORCE)
+set(COMPILE_PROJECTS OFF CACHE BOOL "Compile all the example projects" FORCE)
+
+add_subdirectory(stk)
+
+nanobind_add_module(_pystk_impl src/pystk.cpp)
+
+target_link_libraries(_pystk_impl PRIVATE stk)
+target_include_directories(_pystk_impl PRIVATE stk/include)
+
+message("BUILD_SYSTEM_TARGETS: ${BUILD_SYSTEM_TARGETS}")
+install(
+  TARGETS _pystk_impl
+  DESTINATION pystk
+)
