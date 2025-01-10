@@ -1,13 +1,15 @@
-#include <nanobind/nanobind.h>
+#include "Common.h"
 
-#include <Stk.h>
-
-namespace nb = nanobind;
-
-using namespace nb::literals;
+void add_instrmnt_bindings(nb::module_& m);
+void add_effects_bindings(nb::module_& m);
 
 NB_MODULE(_pystk_impl, m) {
-    m.doc() = "This is a \"hello world\" example with nanobind";
-    m.def("sample_rate", &stk::Stk::sampleRate);
-    m.def("set_sample_rate", &stk::Stk::setSampleRate);
+
+    m.def("sample_rate", &Stk::sampleRate);
+    m.def("set_sample_rate", &Stk::setSampleRate);
+    m.def("rawwave_path", &Stk::rawwavePath);
+    m.def("set_rawwave_path", &Stk::setRawwavePath);
+
+    add_instrmnt_bindings(m);
+    add_effects_bindings(m);
 }
