@@ -21,6 +21,10 @@ set(COMPILE_PROJECTS OFF CACHE BOOL "Compile all the example projects" FORCE)
 add_subdirectory(stk)
 set_property(TARGET stk PROPERTY POSITION_INDEPENDENT_CODE ON)
 
+if(WIN32)
+  target_compile_definitions(stk PUBLIC -D_USE_MATH_DEFINES)
+endif()
+
 nanobind_add_module(_pystk_impl
   src/pystk.cpp
   src/instrmnt.cpp
