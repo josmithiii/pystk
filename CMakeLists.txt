@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.30)
 project(pystk)
 
-find_package(Python 3.10
+find_package(Python
   REQUIRED COMPONENTS Interpreter Development.Module
   OPTIONAL_COMPONENTS Development.SABIModule)
 
@@ -21,7 +21,7 @@ set(COMPILE_PROJECTS OFF CACHE BOOL "Compile all the example projects" FORCE)
 add_subdirectory(stk)
 set_property(TARGET stk PROPERTY POSITION_INDEPENDENT_CODE ON)
 
-nanobind_add_module(_pystk_impl
+nanobind_add_module(_pystk_impl STABLE_ABI NB_STATIC
   src/instrmnt.cpp
   src/effect.cpp
   src/filter.cpp
@@ -44,7 +44,7 @@ endif()
 file(COPY stk/rawwaves DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/src/synthesistoolkit)
 
 install(
-  TARGETS _pystk_impl
+  TARGETS _pystk_impl LIBRARY
   DESTINATION synthesistoolkit
 )
 
