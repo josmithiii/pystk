@@ -5,6 +5,7 @@
 #include <nanobind/ndarray.h>
 #include <nanobind/stl/map.h>
 #include <nanobind/stl/string.h>
+#include <nanobind/stl/vector.h>
 
 #include <Stk.h>
 
@@ -12,7 +13,9 @@ namespace nb = nanobind;
 using namespace nb::literals;
 using namespace stk;
 
-typedef nb::ndarray<nb::numpy, StkFloat, nb::ndim<2>> audio_frames;
+template<int CHANNELS=-1>
+using audio_frames = nb::ndarray<nb::numpy, StkFloat, nb::shape<CHANNELS, -1>>;
+
 typedef nb::ndarray<nb::numpy, StkFloat, nb::shape<1, -1>> mono_frames;
 typedef nb::ndarray<nb::numpy, StkFloat, nb::shape<2, -1>> stereo_frames;
 typedef std::map<int, nb::ndarray<StkFloat, nb::ndim<1>>> controls_dict;
@@ -39,6 +42,25 @@ mono_frames synth_with_controls(T& self, const unsigned long n_samples, const co
     return mono_frames(data, {1, n_samples}, owner);
 }
 
+template<int OUT=-1>
+audio_frames<OUT> stkframes_to_numpy(StkFrames& frames) {
+    unsigned long n_channels = OUT;
+    if (n_channels == -1) n_channels = frames.channels();
+
+    const auto data = new StkFloat[frames.frames() * n_channels];
+
+    nb::capsule owner(data, [](void* p) noexcept {
+        delete[] static_cast<StkFloat*>(p);
+    });
+
+    for (int n = 0; n < frames.frames(); n++) {
+        for (int c = 0; c < n_channels; c++) {
+            data[n * n_channels + c] = frames(n, c);
+        }
+    }
+    return audio_frames<OUT>(data, {n_channels, frames.frames()}, owner);
+}
+
 template<typename T>
 mono_frames effect_mono_to_mono(T& self, const mono_frames& input) {
     const unsigned long n_samples = input.shape(1);
@@ -55,38 +77,17 @@ mono_frames effect_mono_to_mono(T& self, const mono_frames& input) {
     return mono_frames(data, {1, n_samples}, owner);
 }
 
-template<typename T>
-stereo_frames effect_mono_to_stereo(T& self, const mono_frames& input) {
-    const unsigned long n_samples = input.shape(1);
-
-    const auto data = new StkFloat[n_samples * 2];
-
-    nb::capsule owner(data, [](void* p) noexcept {
-        delete[] static_cast<StkFloat*>(p);
-    });
-
+template<typename T, int IN=1, int OUT=1>
+audio_frames<OUT> process_input(T& self, const audio_frames<IN>& input) {
+    int n_samples = input.shape(1);
+    StkFrames frames(n_samples, std::max(IN, OUT));
     for (int n = 0; n < n_samples; n++) {
-        data[n * 2] = self.tick(input(0, n));
-        data[n * 2 + 1] = self.lastOut(1);
+        for (int i = 0; i < IN; i++) {
+            frames(n, i) = input(i, n);
+        }
     }
-    return stereo_frames(data, {2, n_samples}, owner);
-}
-
-template<typename T>
-stereo_frames effect_stereo_to_stereo(T& self, const stereo_frames& input) {
-    const unsigned long n_samples = input.shape(1);
-
-    const auto data = new StkFloat[n_samples * 2];
-
-    nb::capsule owner(data, [](void* p) noexcept {
-        delete[] static_cast<StkFloat*>(p);
-    });
-
-    for (int n = 0; n < n_samples; n++) {
-        data[n * 2] = self.tick(input(0, n), input(1, n));
-        data[n * 2 + 1] = self.lastOut(1);
-    }
-    return stereo_frames(data, {2, n_samples}, owner);
+    self.tick(frames);
+    return stkframes_to_numpy<OUT>(frames);
 }
 
 #endif //PYSTKCOMMON_H

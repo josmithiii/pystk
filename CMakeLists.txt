@@ -21,20 +21,22 @@ set(COMPILE_PROJECTS OFF CACHE BOOL "Compile all the example projects" FORCE)
 add_subdirectory(stk)
 set_property(TARGET stk PROPERTY POSITION_INDEPENDENT_CODE ON)
 
-if(WIN32)
-  target_compile_definitions(stk PUBLIC -D_USE_MATH_DEFINES)
-endif()
-
 nanobind_add_module(_pystk_impl
-  src/pystk.cpp
   src/instrmnt.cpp
   src/effect.cpp
+  src/filter.cpp
+  src/pystk.cpp
 )
 
 target_compile_features(_pystk_impl PRIVATE cxx_std_17)
 
 target_link_libraries(_pystk_impl PRIVATE stk)
 target_include_directories(_pystk_impl PRIVATE stk/include)
+
+if(WIN32)
+  target_compile_definitions(stk PUBLIC -D_USE_MATH_DEFINES)
+  target_compile_definitions(_pystk_impl PRIVATE -D_USE_MATH_DEFINES)
+endif()
 
 # for editable installs
 file(COPY stk/rawwaves DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/src/pystk)

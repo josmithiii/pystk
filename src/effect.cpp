@@ -24,7 +24,7 @@ void add_effects_bindings(nb::module_& m) {
         .def("set_mod_frequency", &Chorus::setModFrequency)
         .def("last_out", &Chorus::lastOut, "channel"_a = 0)
         .def("tick", nb::overload_cast<StkFloat, unsigned int>(&Chorus::tick), "input"_a = 0.0, "channel"_a = 0)
-        .def("process_input", &effect_mono_to_stereo<Chorus>);
+        .def("tick", &process_input<Chorus, 1, 2>);
 
     nb::class_<Echo, Effect>(m, "Echo")
         .def(nb::init<unsigned long>(), "maximum_delay"_a = Stk::sampleRate())
@@ -33,7 +33,7 @@ void add_effects_bindings(nb::module_& m) {
         .def("set_delay", &Echo::setDelay)
         .def("last_out", &Echo::lastOut)
         .def("tick", nb::overload_cast<StkFloat>(&Echo::tick), "input"_a = 0.0)
-        .def("process_input", &effect_mono_to_mono<Echo>);
+        .def("tick", &process_input<Echo, 1, 1>);
 
     nb::class_<FreeVerb, Effect>(m, "FreeVerb")
         .def(nb::init<>())
@@ -49,8 +49,8 @@ void add_effects_bindings(nb::module_& m) {
         .def("clear", &FreeVerb::clear)
         .def("last_out", &FreeVerb::lastOut)
         .def("tick", nb::overload_cast<StkFloat, StkFloat, unsigned int>(&FreeVerb::tick), "inputL"_a = 0.0, "inputR"_a = 0.0, "channel"_a = 0)
-        .def("process_input", &effect_mono_to_stereo<FreeVerb>)
-        .def("process_input", &effect_stereo_to_stereo<FreeVerb>);
+        .def("tick", &process_input<FreeVerb, 1, 2>)
+        .def("tick", &process_input<FreeVerb, 2, 2>);
 
     nb::class_<JCRev, Effect>(m, "JCRev")
         .def(nb::init<StkFloat>(), "t60"_a = 1.0)
@@ -58,14 +58,14 @@ void add_effects_bindings(nb::module_& m) {
         .def("set_t60", &JCRev::setT60)
         .def("last_out", &JCRev::lastOut)
         .def("tick", nb::overload_cast<StkFloat, unsigned int>(&JCRev::tick), "input"_a = 0.0, "channel"_a = 0)
-        .def("process_input", &effect_mono_to_stereo<JCRev>);
+        .def("tick", &process_input<JCRev, 1, 2>);
 
     nb::class_<LentPitShift, Effect>(m, "LentPitShift")
         .def(nb::init<StkFloat>(), "shift"_a = 1.0)
         .def("clear", &LentPitShift::clear)
         .def("set_shift", &LentPitShift::setShift)
         .def("tick", nb::overload_cast<StkFloat>(&LentPitShift::tick), "input"_a = 0.0)
-        .def("process_input", &effect_mono_to_mono<LentPitShift>);
+        .def("tick", &process_input<LentPitShift, 1, 1>);
 
     nb::class_<NRev, Effect>(m, "NRev")
         .def(nb::init<StkFloat>(), "t60"_a = 1.0)
@@ -73,7 +73,7 @@ void add_effects_bindings(nb::module_& m) {
         .def("set_t60", &NRev::setT60)
         .def("last_out", &NRev::lastOut)
         .def("tick", nb::overload_cast<StkFloat, unsigned int>(&NRev::tick), "input"_a = 0.0, "channel"_a = 0)
-        .def("process_input", &effect_mono_to_stereo<NRev>);
+        .def("tick", &process_input<NRev, 1, 2>);
 
     nb::class_<PRCRev, Effect>(m, "PRCRev")
         .def(nb::init<StkFloat>(), "t60"_a = 1.0)
@@ -81,7 +81,7 @@ void add_effects_bindings(nb::module_& m) {
         .def("set_t60", &PRCRev::setT60)
         .def("last_out", &PRCRev::lastOut)
         .def("tick", nb::overload_cast<StkFloat, unsigned int>(&PRCRev::tick), "input"_a = 0.0, "channel"_a = 0)
-        .def("process_input", &effect_mono_to_stereo<PRCRev>);
+        .def("tick", &process_input<PRCRev, 1, 2>);
 
     nb::class_<PitShift, Effect>(m, "PitShift")
         .def(nb::init<>())
@@ -89,5 +89,5 @@ void add_effects_bindings(nb::module_& m) {
         .def("set_shift", &PitShift::setShift)
         .def("last_out", &PitShift::lastOut)
         .def("tick", nb::overload_cast<StkFloat>(&PitShift::tick), "input"_a = 0.0)
-        .def("process_input", &effect_mono_to_mono<PitShift>);
+        .def("tick", &process_input<PitShift, 1, 2>);
 }

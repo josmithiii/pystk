@@ -317,7 +317,7 @@ mono_frames input_process_mesh2D(Mesh2D& self, const mono_frames& input, const c
 void add_instrmnt_bindings(nb::module_& m) {
     nb::class_<Instrmnt>(m, "Instrmnt")
         .def("channels_out", &Instrmnt::channelsOut)
-        .def("process", &synth_with_controls<Instrmnt>, "n_samples"_a, "controls"_a=controls_dict{});
+        .def("tick_controls", &synth_with_controls<Instrmnt>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<BandedWG, Instrmnt>(m, "BandedWG")
         .def(nb::init<>())
@@ -517,8 +517,8 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def("control_change", &Mesh2D::controlChange)
         .def("tick", nb::overload_cast<unsigned int>(&Mesh2D::tick))
         .def("input_tick", &Mesh2D::inputTick)
-        .def("process", &synth_with_controls<Mesh2D>, "n_samples"_a, "controls"_a=controls_dict{})
-        .def("process", &input_process_mesh2D, "input"_a, "controls"_a=controls_dict{});
+        .def("tick_controls", &synth_with_controls<Mesh2D>, "n_samples"_a, "controls"_a=controls_dict{})
+        .def("tick_controls", &input_process_mesh2D, "input"_a, "controls"_a=controls_dict{});
 
     nb::class_<Modal, Instrmnt>(m, "Modal")
         .def("clear", &Modal::clear)
