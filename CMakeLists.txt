@@ -25,6 +25,8 @@ nanobind_add_module(_pystk_impl
   src/instrmnt.cpp
   src/effect.cpp
   src/filter.cpp
+  src/function.cpp
+  src/generator.cpp
   src/pystk.cpp
 )
 
