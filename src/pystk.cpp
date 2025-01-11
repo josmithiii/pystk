@@ -3,6 +3,7 @@
 void add_instrmnt_bindings(nb::module_& m);
 void add_effects_bindings(nb::module_& m);
 void add_filter_bindings(nb::module_& m);
+void add_function_bindings(nb::module_& m);
 
 NB_MODULE(_pystk_impl, m) {
 
@@ -13,5 +14,5 @@ NB_MODULE(_pystk_impl, m) {
 
     add_instrmnt_bindings(m);
     add_effects_bindings(m);
-    add_filter_bindings(m);
+    add_function_bindings(m);
 }
