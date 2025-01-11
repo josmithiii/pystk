@@ -6,6 +6,7 @@ build-backend = "scikit_build_core.build"
 authors = [{name = "David Marttila", email = "david.suedholt@gmail.com"}]
 dependencies = ["numpy>=1.25"]
 description = "Python bindings for the Synthesis ToolKit in C++ (STK)"
+readme = "README.md"
 name = "synthesistoolkit"
 requires-python = ">= 3.10"
 version = "0.0.1"
