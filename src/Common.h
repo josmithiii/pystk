@@ -42,6 +42,24 @@ mono_frames synth_with_controls(T& self, const unsigned long n_samples, const co
     return mono_frames(data, {1, n_samples}, owner);
 }
 
+template<typename T>
+mono_frames process_with_controls(T& self, const mono_frames& input, const controls_dict& controls) {
+    unsigned long n_samples = input.shape(1);
+    const auto data = new StkFloat[n_samples];
+
+    nb::capsule owner(data, [](void* p) noexcept {
+        delete[] static_cast<StkFloat*>(p);
+    });
+
+    for (int n = 0; n < n_samples; n++) {
+        for (const auto& [control, value] : controls) {
+            self.controlChange(control, value(n));
+        }
+        data[n] = self.tick(input(1, n));
+    }
+    return mono_frames(data, {1, n_samples}, owner);
+}
+
 template<int OUT=-1>
 audio_frames<OUT> stkframes_to_numpy(StkFrames& frames) {
     unsigned long n_channels = OUT;
