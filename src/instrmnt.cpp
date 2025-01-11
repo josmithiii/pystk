@@ -317,7 +317,7 @@ mono_frames input_process_mesh2D(Mesh2D& self, const mono_frames& input, const c
 void add_instrmnt_bindings(nb::module_& m) {
     nb::class_<Instrmnt>(m, "Instrmnt")
         .def("channels_out", &Instrmnt::channelsOut)
-        .def("tick_controls", &synth_with_controls<Instrmnt>, "n_samples"_a, "controls"_a=controls_dict{});
+        .def("tick", &synth_with_controls<Instrmnt>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<BandedWG, Instrmnt>(m, "BandedWG")
         .def(nb::init<>())
@@ -333,7 +333,8 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def("note_on", &BandedWG::noteOn)
         .def("note_off", &BandedWG::noteOff)
         .def("control_change", &BandedWG::controlChange)
-        .def("tick", nb::overload_cast<unsigned int>(&BandedWG::tick));
+        .def("tick", [](BandedWG& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<BandedWG>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<BlowBotl, Instrmnt>(m, "BlowBotl")
         .def(nb::init<>())
@@ -345,7 +346,8 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def("note_on", &BlowBotl::noteOn)
         .def("note_off", &BlowBotl::noteOff)
         .def("control_change", &BlowBotl::controlChange)
-        .def("tick", nb::overload_cast<unsigned int>(&BlowBotl::tick));
+        .def("tick", [](BlowBotl& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<BlowBotl>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<BlowHole, Instrmnt>(m, "BlowHole")
         .def(nb::init<StkFloat>(), "lowest_frequency"_a=8.0)
@@ -359,7 +361,8 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def("note_on", &BlowHole::noteOn)
         .def("note_off", &BlowHole::noteOff)
         .def("control_change", &BlowHole::controlChange)
-        .def("tick", nb::overload_cast<unsigned int>(&BlowHole::tick));
+        .def("tick", [](BlowHole& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<BlowHole>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<Bowed, Instrmnt>(m, "Bowed")
         .def(nb::init<>())
@@ -372,7 +375,8 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def("note_on", &Bowed::noteOn)
         .def("note_off", &Bowed::noteOff)
         .def("control_change", &Bowed::controlChange)
-        .def("tick", nb::overload_cast<unsigned int>(&Bowed::tick));
+        .def("tick", [](Bowed& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<Bowed>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<Brass, Instrmnt>(m, "Brass")
         .def(nb::init<StkFloat>(), "lowest_frequency"_a=8.0)
@@ -385,7 +389,8 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def("note_on", &Brass::noteOn)
         .def("note_off", &Brass::noteOff)
         .def("control_change", &Brass::controlChange)
-        .def("tick", nb::overload_cast<unsigned int>(&Brass::tick));
+        .def("tick", [](Brass& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<Brass>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<Clarinet, Instrmnt>(m, "Clarinet")
         .def(nb::init<StkFloat>(), "lowest_frequency"_a=8.0)
@@ -397,14 +402,16 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def("note_on", &Clarinet::noteOn)
         .def("note_off", &Clarinet::noteOff)
         .def("control_change", &Clarinet::controlChange)
-        .def("tick", nb::overload_cast<unsigned int>(&Clarinet::tick));
+        .def("tick", [](Clarinet& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<Clarinet>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<Drummer, Instrmnt>(m, "Drummer")
         .def(nb::init<>())
         .def_ro_static("INSTRUMENT_IDS", &presets::drummer)
         .def("note_on", &Drummer::noteOn)
         .def("note_off", &Drummer::noteOff)
-        .def("tick", nb::overload_cast<unsigned int>(&Drummer::tick));
+        .def("tick", [](Drummer& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<Drummer>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<FM, Instrmnt>(m, "FM")
         .def("load_waves", [](FM& self, const std::vector<std::string>& filenames) {
@@ -430,7 +437,8 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def(nb::init<>())
         .def_ro_static("CONTROL_IDS", &controls::beethree)
         .def("note_on", &BeeThree::noteOn)
-        .def("tick", nb::overload_cast<unsigned int>(&BeeThree::tick));
+        .def("tick", [](BeeThree& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<BeeThree>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<FMVoices, FM>(m, "FMVoices")
         .def(nb::init<>())
@@ -438,40 +446,46 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def("set_frequency", &FMVoices::setFrequency)
         .def("note_on", &FMVoices::noteOn)
         .def("control_change", &FMVoices::controlChange)
-        .def("tick", nb::overload_cast<unsigned int>(&FMVoices::tick));
+        .def("tick", [](FMVoices& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<FMVoices>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<HevyMetl, FM>(m, "HevyMetl")
         .def(nb::init<>())
         .def_ro_static("CONTROL_IDS", &controls::hevymetl)
         .def("note_on", &HevyMetl::noteOn)
-        .def("tick", nb::overload_cast<unsigned int>(&HevyMetl::tick));
+        .def("tick", [](HevyMetl& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<HevyMetl>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<PercFlut, FM>(m, "PercFlut")
         .def(nb::init<>())
         .def_ro_static("CONTROL_IDS", &controls::hevymetl) // same values
         .def("set_frequency", &PercFlut::setFrequency)
         .def("note_on", &PercFlut::noteOn)
-        .def("tick", nb::overload_cast<unsigned int>(&PercFlut::tick));
+        .def("tick", [](PercFlut& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<PercFlut>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<Rhodey, FM>(m, "Rhodey")
         .def(nb::init<>())
         .def_ro_static("CONTROL_IDS", &controls::rhodey)
         .def("set_frequency", &Rhodey::setFrequency)
         .def("note_on", &Rhodey::noteOn)
-        .def("tick", nb::overload_cast<unsigned int>(&Rhodey::tick));
+        .def("tick", [](Rhodey& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<Rhodey>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<TubeBell, FM>(m, "TubeBell")
         .def(nb::init<>())
         .def_ro_static("CONTROL_IDS", &controls::rhodey) // same values
         .def("note_on", &TubeBell::noteOn)
-        .def("tick", nb::overload_cast<unsigned int>(&TubeBell::tick));
+        .def("tick", [](TubeBell& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<TubeBell>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<Wurley, FM>(m, "Wurley")
         .def(nb::init<>())
         .def_ro_static("CONTROL_IDS", &controls::rhodey) // same values
         .def("set_frequency", &Wurley::setFrequency)
         .def("note_on", &Wurley::noteOn)
-        .def("tick", nb::overload_cast<unsigned int>(&Wurley::tick));
+        .def("tick", [](Wurley& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<Wurley>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<Flute, Instrmnt>(m, "Flute")
         .def(nb::init<StkFloat>(), "lowest_frequency"_a=8.0)
@@ -486,7 +500,8 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def("note_on", &Flute::noteOn)
         .def("note_off", &Flute::noteOff)
         .def("control_change", &Flute::controlChange)
-        .def("tick", nb::overload_cast<unsigned int>(&Flute::tick));
+        .def("tick", [](Flute& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<Flute>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<Mandolin, Instrmnt>(m, "Mandolin")
         .def(nb::init<StkFloat>(), "lowest_frequency"_a=8.0)
@@ -501,7 +516,8 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def("note_on", &Mandolin::noteOn)
         .def("note_off", &Mandolin::noteOff)
         .def("control_change", &Mandolin::controlChange)
-        .def("tick", nb::overload_cast<unsigned int>(&Mandolin::tick));
+        .def("tick", [](Mandolin& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<Mandolin>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<Mesh2D, Instrmnt>(m, "Mesh2D")
         .def(nb::init<unsigned short, unsigned short>(), "n_x"_a, "n_y"_a)
@@ -517,8 +533,8 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def("control_change", &Mesh2D::controlChange)
         .def("tick", nb::overload_cast<unsigned int>(&Mesh2D::tick))
         .def("input_tick", &Mesh2D::inputTick)
-        .def("tick_controls", &synth_with_controls<Mesh2D>, "n_samples"_a, "controls"_a=controls_dict{})
-        .def("tick_controls", &input_process_mesh2D, "input"_a, "controls"_a=controls_dict{});
+        .def("tick", &synth_with_controls<Mesh2D>, "n_samples"_a, "controls"_a=controls_dict{})
+        .def("tick", &input_process_mesh2D, "input"_a, "controls"_a=controls_dict{});
 
     nb::class_<Modal, Instrmnt>(m, "Modal")
         .def("clear", &Modal::clear)
@@ -531,7 +547,8 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def("damp", &Modal::damp)
         .def("note_on", &Modal::noteOn)
         .def("note_off", &Modal::noteOff)
-        .def("tick", nb::overload_cast<unsigned int>(&Modal::tick));
+        .def("tick", [](Modal& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<Modal>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<ModalBar, Modal>(m, "ModalBar")
         .def(nb::init<>())
@@ -552,7 +569,8 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def("note_on", &Plucked::noteOn)
         .def("note_off", &Plucked::noteOff)
         .def("control_change", &Plucked::controlChange)
-        .def("tick", nb::overload_cast<unsigned int>(&Plucked::tick));
+        .def("tick", [](Plucked& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<Plucked>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<Recorder, Instrmnt>(m, "Recorder")
         .def(nb::init<>())
@@ -564,7 +582,8 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def("note_on", &Recorder::noteOn)
         .def("note_off", &Recorder::noteOff)
         .def("control_change", &Recorder::controlChange)
-        .def("tick", nb::overload_cast<unsigned int>(&Recorder::tick));
+        .def("tick", [](Recorder& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<Recorder>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<Resonate, Instrmnt>(m, "Resonate")
         .def(nb::init<>())
@@ -577,13 +596,15 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def("note_on", &Resonate::noteOn)
         .def("note_off", &Resonate::noteOff)
         .def("control_change", &Resonate::controlChange)
-        .def("tick", nb::overload_cast<unsigned int>(&Resonate::tick));
+        .def("tick", [](Resonate& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<Resonate>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<Sampler, Instrmnt>(m, "Sampler")
         .def("key_on", &Sampler::keyOn)
         .def("key_off", &Sampler::keyOff)
         .def("note_off", &Sampler::noteOn)
-        .def("tick", nb::overload_cast<unsigned int>(&Sampler::tick));
+        .def("tick", [](Sampler& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<Sampler>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<Moog, Sampler>(m, "Moog")
         .def(nb::init<>())
@@ -593,7 +614,8 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def("set_modulation_speed", &Moog::setModulationSpeed)
         .def("set_modulation_depth", &Moog::setModulationDepth)
         .def("control_change", &Moog::controlChange)
-        .def("tick", nb::overload_cast<unsigned int>(&Moog::tick));
+        .def("tick", [](Moog& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<Moog>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<Saxofony, Instrmnt>(m, "Saxofony")
         .def(nb::init<StkFloat>(), "lowest_frequency"_a=8.0)
@@ -606,7 +628,8 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def("note_on", &Saxofony::noteOn)
         .def("note_off", &Saxofony::noteOff)
         .def("control_change", &Saxofony::controlChange)
-        .def("tick", nb::overload_cast<unsigned int>(&Saxofony::tick));
+        .def("tick", [](Saxofony& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<Saxofony>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<Shakers, Instrmnt>(m, "Shakers")
         .def(nb::init<int>(), "type"_a=0)
@@ -615,7 +638,8 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def("note_on", &Shakers::noteOn)
         .def("note_off", &Shakers::noteOff)
         .def("control_change", &Shakers::controlChange)
-        .def("tick", nb::overload_cast<unsigned int>(&Shakers::tick));
+        .def("tick", [](Shakers& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<Shakers>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<Simple, Instrmnt>(m, "Simple")
         .def(nb::init<>())
@@ -626,7 +650,8 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def("note_on", &Simple::noteOn)
         .def("note_off", &Simple::noteOff)
         .def("control_change", &Simple::controlChange)
-        .def("tick", nb::overload_cast<unsigned int>(&Simple::tick));
+        .def("tick", [](Simple& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<Simple>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<Sitar, Instrmnt>(m, "Sitar")
         .def(nb::init<StkFloat>(), "lowest_frequency"_a=8.0)
@@ -635,7 +660,8 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def("note_on", &Sitar::noteOn)
         .def("note_off", &Sitar::noteOff)
         .def("control_change", &Sitar::controlChange)
-        .def("tick", nb::overload_cast<unsigned int>(&Sitar::tick));
+        .def("tick", [](Sitar& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<Sitar>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<StifKarp, Instrmnt>(m, "StifKarp")
         .def(nb::init<StkFloat>(), "lowest_frequency"_a=8.0)
@@ -649,7 +675,8 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def("note_on", &StifKarp::noteOn)
         .def("note_off", &StifKarp::noteOff)
         .def("control_change", &StifKarp::controlChange)
-        .def("tick", nb::overload_cast<unsigned int>(&StifKarp::tick));
+        .def("tick", [](StifKarp& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<StifKarp>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<VoicForm, Instrmnt>(m, "VoicForm")
         .def(nb::init<>())
@@ -668,7 +695,8 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def("note_on", &VoicForm::noteOn)
         .def("note_off", &VoicForm::noteOff)
         .def("control_change", &VoicForm::controlChange)
-        .def("tick", nb::overload_cast<unsigned int>(&VoicForm::tick));
+        .def("tick", [](VoicForm& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<VoicForm>, "n_samples"_a, "controls"_a=controls_dict{});
 
     nb::class_<Whistle, Instrmnt>(m, "Whistle")
         .def(nb::init<>())
@@ -680,5 +708,6 @@ void add_instrmnt_bindings(nb::module_& m) {
         .def("note_on", &Whistle::noteOn)
         .def("note_off", &Whistle::noteOff)
         .def("control_change", &Whistle::controlChange)
-        .def("tick", nb::overload_cast<unsigned int>(&Whistle::tick));
+        .def("tick", [](Whistle& self) { return self.tick(); })
+        .def("tick", &synth_with_controls<Whistle>, "n_samples"_a, "controls"_a=controls_dict{});
 }
