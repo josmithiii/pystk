@@ -136,7 +136,7 @@ void add_filter_bindings(nb::module_& m) {
         .def("set_zero", &OneZero::setZero)
         .def("last_out", &OneZero::lastOut)
         .def("tick", nb::overload_cast<StkFloat>(&OneZero::tick))
-        .def("tick", &effect_mono_to_mono<OneZero>);
+        .def("tick", &process_input<OneZero, 1, 1>);
 
     nb::class_<PoleZero, Filter>(m, "PoleZero")
         .def(nb::init<>())
@@ -148,7 +148,7 @@ void add_filter_bindings(nb::module_& m) {
         .def("set_block_zero", &PoleZero::setBlockZero)
         .def("last_out", &PoleZero::lastOut)
         .def("tick", nb::overload_cast<StkFloat>(&PoleZero::tick))
-        .def("tick", &effect_mono_to_mono<PoleZero>);
+        .def("tick", &process_input<PoleZero, 1, 1>);
 
     nb::class_<TapDelay, Filter>(m, "TapDelay")
         .def(nb::init<std::vector<unsigned long>, unsigned long>(), "taps"_a = std::vector<unsigned long>(1, 0), "max_delay"_a = 4095)

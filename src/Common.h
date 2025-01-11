@@ -62,19 +62,10 @@ audio_frames<OUT> stkframes_to_numpy(StkFrames& frames) {
 }
 
 template<typename T>
-mono_frames effect_mono_to_mono(T& self, const mono_frames& input) {
-    const unsigned long n_samples = input.shape(1);
-
-    const auto data = new StkFloat[n_samples];
-
-    nb::capsule owner(data, [](void* p) noexcept {
-        delete[] static_cast<StkFloat*>(p);
-    });
-
-    for (int n = 0; n < n_samples; n++) {
-        data[n] = self.tick(input(0, n));
-    }
-    return mono_frames(data, {1, n_samples}, owner);
+audio_frames<1> generate(T& self, int n_samples) {
+    StkFrames frames(n_samples, 1);
+    self.tick(frames);
+    return stkframes_to_numpy<1>(frames);
 }
 
 template<typename T, int IN=1, int OUT=1>
