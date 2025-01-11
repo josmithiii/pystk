@@ -1,6 +1,6 @@
-import pystk
+import synthesistoolkit as stk
 
 def test_samplerate():
     sr = 41919
-    pystk.set_sample_rate(sr)
-    assert pystk.sample_rate() == sr
+    stk.set_sample_rate(sr)
+    assert stk.sample_rate() == sr

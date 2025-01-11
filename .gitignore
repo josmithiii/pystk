@@ -4,7 +4,7 @@ build
 dist
 cmake-build-*
 uv.lock
-src/pystk/rawwaves
+src/synthesistoolkit/rawwaves
 .DS_Store
 *.wav
 rebuild.sh

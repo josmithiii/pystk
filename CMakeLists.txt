@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.30)
-project(python_bindings)
+project(pystk)
 
 find_package(Python 3.10
   REQUIRED COMPONENTS Interpreter Development.Module
@@ -41,14 +41,14 @@ if(WIN32)
 endif()
 
 # for editable installs
-file(COPY stk/rawwaves DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/src/pystk)
+file(COPY stk/rawwaves DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/src/synthesistoolkit)
 
 install(
   TARGETS _pystk_impl
-  DESTINATION pystk
+  DESTINATION synthesistoolkit
 )
 
 install(
   DIRECTORY stk/rawwaves
-  DESTINATION pystk
+  DESTINATION synthesistoolkit
 )
